@@ -1,15 +1,14 @@
-from django.http import JsonResponse
-from rest_framework.decorators import api_view
+import json
+
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
-from rest_framework.viewsets import ViewSet
-from django.contrib.auth.decorators import login_required
-import json
-from django.conf import settings
-
-from recipes.models import (Ingredient, Recipe, FavoriteRecipe, User,
-                            Subscription)
+from recipes.models import (FavoriteRecipe, Ingredient, Recipe, Subscription,
+                            User)
+from rest_framework.decorators import api_view
 
 from .serializers import IngredientSerializer
 
@@ -69,22 +68,18 @@ class ShoppingListView(View):
         req = json.loads(request.body)
         recipe_id = req.get('id', None)
         if recipe_id is not None:
+            
             if settings.PURCHASE_SESSION_ID not in request.session:
                 request.session[settings.PURCHASE_SESSION_ID] = list()
+
             if recipe_id not in request.session[settings.PURCHASE_SESSION_ID]:
                 request.session[settings.PURCHASE_SESSION_ID].append(recipe_id)
                 request.session.save()
-                print(request.session[settings.PURCHASE_SESSION_ID])
                 return JsonResponse({'success': True})
             return JsonResponse({'success': False})
         return JsonResponse({'success': False}, status=400)
 
-
     def delete(self, request, recipe_id):
-        print(recipe_id)
-
         request.session[settings.PURCHASE_SESSION_ID].remove(str(recipe_id))
         request.session.save()
-        print(request.session[settings.PURCHASE_SESSION_ID])
-
         return JsonResponse({'success': True})
