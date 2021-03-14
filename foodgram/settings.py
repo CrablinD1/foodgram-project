@@ -8,7 +8,6 @@ env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -18,21 +17,20 @@ SECRET_KEY = env.str("SECRET_KEY", default='SECRET')
 
 DEBUG = env.bool("DEBUG", default=False)
 
-
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
 INSTALLED_APPS = [
+    'recipes',
     'users',
+    'about',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'recipes',
     'sorl.thumbnail',
     'api',
     'debug_toolbar',
@@ -70,15 +68,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
 if DEBUG:
     DATABASES = {
         'default': {
@@ -98,7 +87,6 @@ else:
         }
     }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -117,7 +105,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -135,27 +122,22 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-
 STATIC_URL = '/static/'
-
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static/'),
 ]
+
 if not DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, "collected_static")
-
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
 LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = '/'
 
-
 PURCHASE_SESSION_ID = 'purchase'
-
 
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
