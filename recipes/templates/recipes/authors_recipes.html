@@ -10,6 +10,7 @@
         </div>
         <div class="card-user__body">
             <ul class="card-user__items">
+
                 {% for recipe in author.author_recipes.all reversed %}
                     {% if forloop.counter < 4 %}
                         <li class="card-user__item">
@@ -30,6 +31,7 @@
                         </li>
                     {% endif %}
                 {% endfor %}
+
                 {% if author.author_recipes.count > 3 %}
                     <li class="card-user__item">
                         <a href="{% url 'profile' username=author.username %}"
@@ -39,12 +41,15 @@
                                 {% endwith %}
                     </li>
                 {% endif %}
+
             </ul>
         </div>
+
         <div class="card-user__footer">
             <a href="{% url 'subscription' %}">
                 <button class="button button_style_light-blue button_size_auto" name="subscribe">Отписаться</button>
             </a>
         </div>
+
     </div>
 </div>

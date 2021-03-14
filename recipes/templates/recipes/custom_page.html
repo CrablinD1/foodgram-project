@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% load custom_filters %}
+
 {% block title %}
     {% with current_url=request.resolver_match.url_name %}
         {% if 'shopping' in current_url %}
@@ -12,6 +12,7 @@
         {% endif %}
     {% endwith %}
 {% endblock %}
+
 {% block static %}
     <link rel="stylesheet" href="{% static 'pages/index.css' %}">
 {% endblock %}
@@ -19,6 +20,7 @@
 {% block content %}
     <main class="main container">
         <div class="custom-center-block">
+
             {% with current_url=request.resolver_match.url_name %}
                 {% if 'shopping' in current_url %}
                     <h1 class="main__title">Список покупок</h1>
@@ -31,11 +33,13 @@
                     <p class="custom-text-block">У вас нет избранных рецептов</p>
                 {% endif %}
             {% endwith %}
+
             <div class="custom-button-block">
                 <a href="{% url  'index' %}">
                     <button class="button button_style_blue">Перейти на главную</button>
                 </a>
             </div>
+
         </div>
     </main>
 {% endblock %}

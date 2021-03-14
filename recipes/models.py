@@ -1,12 +1,9 @@
-from django.db import models
 from django.contrib.auth import get_user_model
-
-# from django.shortcuts import reverse
+from django.core.validators import MinValueValidator
+from django.db import models
 
 User = get_user_model()
 
-
-# verbose_name, related_name
 
 class Ingredient(models.Model):
     title = models.CharField(max_length=255, verbose_name='ingredient title')
@@ -18,8 +15,9 @@ class Ingredient(models.Model):
 
 
 class Tag(models.Model):
-    title = models.CharField(max_length=50)
-    slug = models.SlugField(max_length=50, unique=True)
+    title = models.CharField(max_length=50, verbose_name='tag title')
+    slug = models.SlugField(max_length=50, verbose_name='tag slug',
+                            unique=True)
     color = models.SlugField(verbose_name='tag color')
 
     def __str__(self):
@@ -40,15 +38,17 @@ class RecipeManager(models.Manager):
 class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE,
                                related_name='author_recipes')
-    title = models.CharField(max_length=255)
-    image = models.ImageField(upload_to='recipe/', blank=True,
-                              null=True)
+    title = models.CharField(max_length=255, verbose_name='recipe title')
+    image = models.ImageField(upload_to='recipe/', blank=True, null=True,
+                              verbose_name='recipe image')
     description = models.TextField(verbose_name='recipe description')
     ingredients = models.ManyToManyField(Ingredient,
                                          through='RecipeIngredient',
-                                         blank=True)  # related
+                                         blank=True)
     tags = models.ManyToManyField(Tag, related_name='recipe_tag', blank=True)
-    cooking_time = models.PositiveIntegerField()
+    cooking_time = models.PositiveIntegerField(
+        validators=[MinValueValidator(1)],
+        verbose_name='recipe cooking time')
     pub_date = models.DateTimeField(verbose_name='date published',
                                     auto_now_add=True,
                                     db_index=True)
@@ -60,9 +60,8 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    ingredient = models.ForeignKey(Ingredient,
-                                   on_delete=models.CASCADE,
-                                   related_name='ingredient_amount')  # related_name here
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE,
+                                   related_name='ingredient_amount')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
                                related_name='recipe_amount')
     amount = models.IntegerField()

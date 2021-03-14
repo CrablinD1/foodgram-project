@@ -1,9 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 {% load custom_filters %}
-{% block title %}{{ author.get_full_name|default:author.username }}{% endblock %}
-{% block static %}
 
+{% block title %}
+    {{ author.get_full_name|default:author.username }}
+{% endblock %}
+
+{% block static %}
     <link rel="stylesheet" href="{% static 'pages/index.css' %}">
 {% endblock %}
 
@@ -13,6 +16,7 @@
             <h1 class="main__title">{{ author.get_full_name|default:author.username }}</h1>
             {% include 'recipes/tags.html' %}
         </div>
+
         <div class="author-subscribe" data-author="{{ author.id }}">
             {% if request.user.is_authenticated and request.user != author %}
                 {% if author|is_subscribe:user %}
@@ -28,6 +32,7 @@
                 {% endif %}
             {% endif %}
         </div>
+
         <div class="card-list">
             {% for recipe in page %}
                 {% include 'recipes/recipe.html' %}

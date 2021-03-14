@@ -1,8 +1,7 @@
-from django import template
-from recipes.models import FavoriteRecipe, Tag, Subscription
-# from api.views import ShoppingList
 import pymorphy2
+from django import template
 from django.conf import settings
+from recipes.models import FavoriteRecipe, Subscription, Tag
 
 register = template.Library()
 
@@ -60,10 +59,7 @@ def word_form(word, number):
 @register.filter
 def in_shopping_list(request, recipe_id):
     try:
-        # print(f'{request.session[settings.PURCHASE_SESSION_ID]} - это фильтр')
-        # print(recipe_id)
         return str(recipe_id) in request.session[settings.PURCHASE_SESSION_ID]
-        # return request.session[str(recipe_id)]
     except KeyError:
         return False
 

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load custom_filters %}
+
 {% block title %}
     {% if recipe %}
         Редактирование рецепта
@@ -8,6 +9,7 @@
         Создание рецепта
     {% endif %}
 {% endblock %}
+
 {% block static %}
     <link rel="stylesheet" href="{% static 'pages/form.css' %}">
 {% endblock %}

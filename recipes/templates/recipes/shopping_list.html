@@ -2,9 +2,12 @@
 {% load static %}
 {% load custom_filters %}
 {% load thumbnail %}
-{% block title %}Список покупок{% endblock %}
-{% block static %}
 
+{% block title %}
+    Список покупок
+{% endblock %}
+
+{% block static %}
     <link rel="stylesheet" href="{% static 'pages/shopList.css' %}">
 {% endblock %}
 
@@ -41,6 +44,7 @@
         </div>
     </main>
 {% endblock %}
+
 {% block js %}
     <script src="{% static 'js/config/config.js' %}"></script>
     <script src="{% static 'js/components/Header.js' %}"></script>

@@ -1,5 +1,5 @@
-from django.forms import (ModelForm, ModelMultipleChoiceField,
-                          CheckboxSelectMultiple)
+from django.forms import (CheckboxSelectMultiple, ModelForm,
+                          ModelMultipleChoiceField)
 
 from .models import Recipe, Tag
 

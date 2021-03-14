@@ -1,16 +1,18 @@
-from django.shortcuts import get_object_or_404, redirect, render
+import logging
+
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Sum
-from .forms import RecipeForm
-from .models import (Recipe, Ingredient, RecipeIngredient, User,
-                     FavoriteRecipe, Subscription)
-from .utils import get_ingredients
-from django.conf import settings
 from django.http import HttpResponse
-import logging
+from django.shortcuts import get_object_or_404, redirect, render
 
-logging.basicConfig(filename="log.txt", level=logging.INFO)
+from .forms import RecipeForm
+from .models import (FavoriteRecipe, Ingredient, Recipe, RecipeIngredient,
+                     Subscription, User)
+from .utils import get_ingredients
+
+logging.basicConfig(filename='log.txt', level=logging.INFO)
 
 
 def index(request):
@@ -36,8 +38,8 @@ def new_recipe(request):
             recipe.save()
             form.save_m2m()
             ingredients = get_ingredients(request)
-            for ing_title, amount in ingredients.items():
-                ingredient = get_object_or_404(Ingredient, title=ing_title)
+            for title, amount in ingredients.items():
+                ingredient = get_object_or_404(Ingredient, title=title)
                 recipe_ing = RecipeIngredient(recipe=recipe,
                                               ingredient=ingredient,
                                               amount=amount)
@@ -50,7 +52,7 @@ def recipe_edit(request, username, recipe_id):
     author = get_object_or_404(User, username=username)
     recipe = get_object_or_404(author.author_recipes, pk=recipe_id)
     if author != request.user:
-        return redirect('post_view', username, recipe_id)
+        return redirect('recipe_view', username, recipe_id)
     else:
         form = RecipeForm(request.POST or None, files=request.FILES or None,
                           instance=recipe)
@@ -58,8 +60,8 @@ def recipe_edit(request, username, recipe_id):
             if form.is_valid():
                 form.save()
                 ingredients = get_ingredients(request)
-                for ing_title, amount in ingredients.items():
-                    ingredient = get_object_or_404(Ingredient, title=ing_title)
+                for title, amount in ingredients.items():
+                    ingredient = get_object_or_404(Ingredient, title=title)
                     recipe_ing = RecipeIngredient(recipe=recipe,
                                                   ingredient=ingredient,
                                                   amount=amount)
@@ -74,15 +76,8 @@ def recipe_delete(request, username, recipe_id):
     author = get_object_or_404(User, username=username)
     recipe = get_object_or_404(author.author_recipes, pk=recipe_id)
     if author != request.user:
-        return redirect('post_view', username, recipe_id)
+        return redirect('recipe_view', username, recipe_id)
     else:
-        try:
-            if str(recipe_id) in request.session[settings.PURCHASE_SESSION_ID]:
-                request.session[settings.PURCHASE_SESSION_ID].remove(
-                    str(recipe_id))
-                request.session.save()
-        except Exception as e:
-            logging.error(str(e))
         recipe.delete()
     return redirect('index')
 
@@ -112,7 +107,7 @@ def favorite_recipe(request):
     paginator = Paginator(favorite_list, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    if len(page) == 0:
+    if not page:
         return render(request, 'recipes/custom_page.html')
     return render(request, 'recipes/favorite.html',
                   {'page': page, 'paginator': paginator})
@@ -124,7 +119,7 @@ def subscriptions_index(request):
     paginator = Paginator(subscriptions_list, 3)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    if len(page) == 0:
+    if not page:
         return render(request, 'recipes/custom_page.html')
     return render(request, 'recipes/subscription.html',
                   {'page': page, 'paginator': paginator})
@@ -137,7 +132,7 @@ def shopping_list(request):
     except Exception as e:
         logging.error(str(e))
         return render(request, 'recipes/custom_page.html')
-    if len(recipes) == 0:
+    if not recipes:
         return render(request, 'recipes/custom_page.html')
     return render(request, 'recipes/shopping_list.html', {'recipes': recipes})
 
@@ -146,10 +141,9 @@ def delete_purchase(request, recipe_id):
     try:
         request.session[settings.PURCHASE_SESSION_ID].remove(str(recipe_id))
         request.session.save()
-        return redirect('shopping_list')
     except Exception as e:
         logging.error(str(e))
-        return redirect('shopping_list')
+    return redirect('shopping_list')
 
 
 def save_shopping_list(request):
