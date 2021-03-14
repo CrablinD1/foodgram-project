@@ -68,7 +68,6 @@ class ShoppingListView(View):
         req = json.loads(request.body)
         recipe_id = req.get('id', None)
         if recipe_id is not None:
-            
             if settings.PURCHASE_SESSION_ID not in request.session:
                 request.session[settings.PURCHASE_SESSION_ID] = list()
 
