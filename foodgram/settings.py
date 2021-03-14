@@ -13,17 +13,18 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = env.str("SECRET_KEY", default='SECRET')
+SECRET_KEY = env.str('SECRET_KEY', default='SECRET')
 
-DEBUG = env.bool("DEBUG", default=False)
+DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = ['*']
 
 # Application definition
 
 INSTALLED_APPS = [
-    'recipes',
     'users',
+    'recipes',
+    'api',
     'about',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -32,7 +33,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sorl.thumbnail',
-    'api',
     'debug_toolbar',
 ]
 
@@ -123,13 +123,13 @@ INTERNAL_IPS = [
 ]
 
 STATIC_URL = '/static/'
+if DEBUG:
+    STATICFILES_DIRS = [
+        os.path.join(BASE_DIR, 'static/'),
+    ]
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static/'),
-]
 
-if not DEBUG:
-    STATIC_ROOT = os.path.join(BASE_DIR, "collected_static")
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -139,5 +139,5 @@ LOGIN_REDIRECT_URL = '/'
 
 PURCHASE_SESSION_ID = 'purchase'
 
-EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
