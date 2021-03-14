@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load custom_filters %}
-{% block title %}Вы вышли из системы{% endblock %}
+{% block title %}Ошибка 404{% endblock %}
 {% block static %}
     <link rel="stylesheet" href="{% static 'pages/index.css' %}">
 {% endblock %}
@@ -9,8 +9,8 @@
 {% block content %}
     <main class="main container">
         <div class="custom-center-block">
-            <h1 class="main__title">Вы вышли из системы</h1>
-            <p class="custom-text-block">Вы вышли из своей учётной записи. Ждём вас снова!</p>
+            <h1 class="main__title">Ошибка 404</h1>
+            <p class="custom-text-block">Страница  <code> {{ path }} </code>  не найдена</p>
             <div class="custom-button-block">
                 <a href="{% url  'index' %}">
                     <button class="button button_style_blue">Перейти на главную</button>

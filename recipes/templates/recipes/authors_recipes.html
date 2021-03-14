@@ -1,0 +1,50 @@
+{% load thumbnail %}
+{% load custom_filters %}
+{% csrf_token %}
+<div class="card-list">
+    <div class="card-user" data-author="{{ author.id }}">
+        <div class="card-user__header">
+            <h2 class="card-user__title"><a
+                    href="{% url 'profile' username=author %}">{{ author.get_full_name|default:author.username }}</a>
+            </h2>
+        </div>
+        <div class="card-user__body">
+            <ul class="card-user__items">
+                {% for recipe in author.author_recipes.all reversed %}
+                    {% if forloop.counter < 4 %}
+                        <li class="card-user__item">
+                            <div class="recipe">
+                                {% thumbnail recipe.image "100x100" crop="center" as im %}
+                                    <a href="{% url 'recipe_view' recipe_id=recipe.id username=author %}"
+                                       class="link" target="_blank"><img
+                                            src="{{ im.url }}"
+                                            width="{{ im.width }}"
+                                            height="{{ im.height }}"
+                                            alt="{{ recipe.title }}"
+                                            class="recipe__image"></a>
+                                {% endthumbnail %}
+                                <h3 class="recipe__title">{{ recipe.title }}</h3>
+                                <p class="recipe__text"><span class="icon-time"></span> {{ recipe.cooking_time }} мин.
+                                </p>
+                            </div>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                {% if author.author_recipes.count > 3 %}
+                    <li class="card-user__item">
+                        <a href="{% url 'profile' username=author.username %}"
+                                {% with word='рецепт' count=author.author_recipes.count|subtract:3 %}
+                           class="card-user__link link">
+                                        Еще {{ count }} {{ word|word_form:count }}...</a>
+                                {% endwith %}
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="card-user__footer">
+            <a href="{% url 'subscription' %}">
+                <button class="button button_style_light-blue button_size_auto" name="subscribe">Отписаться</button>
+            </a>
+        </div>
+    </div>
+</div>

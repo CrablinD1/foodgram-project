@@ -3,7 +3,7 @@ import json
 
 from django.core.management.base import BaseCommand
 
-from recipes.models import Ingredient
+from recipes.models import Ingredient, Tag
 
 
 class Command(BaseCommand):
@@ -31,5 +31,9 @@ class Command(BaseCommand):
                     print(msg)
 
     def handle(self, *args, **options):
-        """Call the function to import data."""
+        Tag.objects.get_or_create(title='завтрак', slug='breakfast',
+                                  color='orange')
+        Tag.objects.get_or_create(title='обед', slug='lunch', color='green')
+        Tag.objects.get_or_create(title='ужин', slug='dinner', color='purple')
+        print('Tags importing done')
         self.import_ingredients_from_file("ingredients.json")
