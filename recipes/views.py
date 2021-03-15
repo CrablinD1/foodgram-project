@@ -65,7 +65,6 @@ def recipe_edit(request, username, recipe_id):
                       {'form': form, 'recipe': recipe})
 
 
-
 @login_required
 def recipe_delete(request, username, recipe_id):
     recipe = get_object_or_404(Recipe, author__username=username, id=recipe_id)
