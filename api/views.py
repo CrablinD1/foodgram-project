@@ -17,7 +17,7 @@ from .serializers import IngredientSerializer
 @api_view(['GET'])
 def ingredients(request):
     query = request.GET.get('query')
-    data = Ingredient.objects.filter(title__contains=query).all()
+    data = Ingredient.objects.filter(title__contains=query)
     serializer = IngredientSerializer(data, many=True)
     return JsonResponse(serializer.data, safe=False)
 
@@ -25,14 +25,12 @@ def ingredients(request):
 class FavoritesView(LoginRequiredMixin, View):
     def post(self, request):
         req = json.loads(request.body)
-        recipe_id = req.get('id', None)
+        recipe_id = req.get('id')
         if recipe_id is not None:
             recipe = get_object_or_404(Recipe, pk=recipe_id)
-            obj, created = FavoriteRecipe.objects.get_or_create(
+            _, created = FavoriteRecipe.objects.get_or_create(
                 user=request.user, recipe=recipe)
-            if created:
-                return JsonResponse({'success': True})
-            return JsonResponse({'success': False})
+            return JsonResponse({'success': created})
         return JsonResponse({'success': False}, status=400)
 
     def delete(self, request, recipe_id):
@@ -45,15 +43,12 @@ class FavoritesView(LoginRequiredMixin, View):
 class SubscriptionView(LoginRequiredMixin, View):
     def post(self, request):
         req = json.loads(request.body)
-        print(req)
-        author_id = req.get('id', None)
+        author_id = req.get('id')
         if author_id is not None:
             author = get_object_or_404(User, pk=author_id)
-            obj, created = Subscription.objects.get_or_create(
+            _, created = Subscription.objects.get_or_create(
                 user=request.user, author=author)
-            if created:
-                return JsonResponse({'success': True})
-            return JsonResponse({'success': False})
+            return JsonResponse({'success': created})
         return JsonResponse({'success': False}, status=400)
 
     def delete(self, request, author_id):
@@ -66,7 +61,7 @@ class SubscriptionView(LoginRequiredMixin, View):
 class ShoppingListView(View):
     def post(self, request):
         req = json.loads(request.body)
-        recipe_id = req.get('id', None)
+        recipe_id = req.get('id')
         if recipe_id is not None:
             if settings.PURCHASE_SESSION_ID not in request.session:
                 request.session[settings.PURCHASE_SESSION_ID] = list()
@@ -75,7 +70,6 @@ class ShoppingListView(View):
                 request.session[settings.PURCHASE_SESSION_ID].append(recipe_id)
                 request.session.save()
                 return JsonResponse({'success': True})
-            return JsonResponse({'success': False})
         return JsonResponse({'success': False}, status=400)
 
     def delete(self, request, recipe_id):
