@@ -2,7 +2,7 @@ import pymorphy2
 from django import template
 from django.conf import settings
 
-from recipes.models import FavoriteRecipe, Subscription, Tag
+from recipes.models import Subscription, Tag
 
 register = template.Library()
 
