@@ -6,9 +6,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
+from rest_framework.decorators import api_view
+
 from recipes.models import (FavoriteRecipe, Ingredient, Recipe, Subscription,
                             User)
-from rest_framework.decorators import api_view
 
 from .serializers import IngredientSerializer
 

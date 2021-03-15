@@ -128,3 +128,5 @@ PURCHASE_SESSION_ID = 'purchase'
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+
+OBJECT_PER_PAGE = 6

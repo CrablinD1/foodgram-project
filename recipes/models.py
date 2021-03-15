@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 
+from .managers import FavoriteRecipeManager, RecipeManager
+
 User = get_user_model()
 
 
@@ -20,19 +22,12 @@ class Tag(models.Model):
                             unique=True)
     color = models.SlugField(verbose_name='tag color')
 
+    class Meta:
+        verbose_name = "tag"
+        verbose_name_plural = "tags"
+
     def __str__(self):
         return f'{self.title}'
-
-
-class RecipeManager(models.Manager):
-
-    @staticmethod
-    def tag_filter(tags):
-        if tags:
-            return Recipe.objects.filter(tags__slug__in=tags).order_by(
-                '-pub_date').distinct()
-        else:
-            return Recipe.objects.order_by('-pub_date').all()
 
 
 class Recipe(models.Model):
@@ -55,6 +50,11 @@ class Recipe(models.Model):
 
     objects = RecipeManager()
 
+    class Meta:
+        verbose_name = 'Recipe'
+        verbose_name_plural = 'Recipes'
+        ordering = ['-pub_date']
+
     def __str__(self):
         return f'{self.pk} - {self.title} - {self.author}'
 
@@ -66,21 +66,14 @@ class RecipeIngredient(models.Model):
                                related_name='recipe_amount')
     amount = models.IntegerField()
 
-
-class FavoriteRecipeManager(models.Manager):
-
-    @staticmethod
-    def favorite_recipe(user, tags):
-        favorite = FavoriteRecipe.objects.filter(user=user).all()
-        recipes_id = favorite.values_list('recipe', flat=True)
-        favorite_list = Recipe.objects.tag_filter(tags).filter(
-            pk__in=recipes_id).order_by('-pub_date')
-        return favorite_list
+    class Meta:
+        verbose_name = 'Recipe Ingredient'
+        verbose_name_plural = 'Recipes Ingredients'
 
 
 class FavoriteRecipe(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             related_name='users_favorite')
+                             related_name='favorites')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
                                related_name='favorite_recipes')
 

@@ -7,6 +7,8 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
+from foodgram.settings import OBJECT_PER_PAGE
+
 from .forms import RecipeForm
 from .models import (FavoriteRecipe, Ingredient, Recipe, RecipeIngredient,
                      Subscription, User)
@@ -18,67 +20,58 @@ logging.basicConfig(filename='log.txt', level=logging.INFO)
 def index(request):
     tags = request.GET.getlist('tag')
     recipe_list = Recipe.objects.tag_filter(tags)
-    paginator = Paginator(recipe_list, 6)
+    paginator = Paginator(recipe_list, OBJECT_PER_PAGE)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     return render(request, 'index.html',
                   {'page': page, 'paginator': paginator})
 
 
+def save_recipe(request, form, recipe):
+    form.save()
+    ingredients = get_ingredients(request)
+    for title, amount in ingredients.items():
+        ingredient = get_object_or_404(Ingredient, title=title)
+        recipe_ing = RecipeIngredient(recipe=recipe,
+                                      ingredient=ingredient,
+                                      amount=amount)
+        recipe_ing.save()
+
+
 @login_required
 def new_recipe(request):
     form = RecipeForm(request.POST or None, files=request.FILES or None)
     context = {'form': form}
-    if request.method != 'POST':
-        return render(request, 'recipes/new_recipe.html', context)
-    else:
-        if form.is_valid():
-            recipe = form.save(commit=False)
-            recipe.author = request.user
-            recipe.save()
-            form.save_m2m()
-            ingredients = get_ingredients(request)
-            for title, amount in ingredients.items():
-                ingredient = get_object_or_404(Ingredient, title=title)
-                recipe_ing = RecipeIngredient(recipe=recipe,
-                                              ingredient=ingredient,
-                                              amount=amount)
-                recipe_ing.save()
-            return redirect('index')
+    if form.is_valid():
+        recipe = form.save(commit=False)
+        recipe.author = request.user
+        save_recipe(request, form, recipe)
+        return redirect('index')
+    return render(request, 'recipes/new_recipe.html', context)
 
 
 @login_required
 def recipe_edit(request, username, recipe_id):
-    author = get_object_or_404(User, username=username)
-    recipe = get_object_or_404(author.author_recipes, pk=recipe_id)
-    if author != request.user:
+    recipe = get_object_or_404(Recipe, author__username=username, id=recipe_id)
+    if request.user != request.user:
         return redirect('recipe_view', username, recipe_id)
     else:
         form = RecipeForm(request.POST or None, files=request.FILES or None,
                           instance=recipe)
-        if request.method == 'POST':
-            if form.is_valid():
-                form.save()
-                ingredients = get_ingredients(request)
-                for title, amount in ingredients.items():
-                    ingredient = get_object_or_404(Ingredient, title=title)
-                    recipe_ing = RecipeIngredient(recipe=recipe,
-                                                  ingredient=ingredient,
-                                                  amount=amount)
-                    recipe_ing.save()
-                return redirect('recipe_view', username, recipe_id)
+        if form.is_valid():
+            save_recipe(request, form, recipe)
+            return redirect('recipe_view', username, recipe_id)
         return render(request, 'recipes/new_recipe.html',
                       {'form': form, 'recipe': recipe})
 
 
+
 @login_required
 def recipe_delete(request, username, recipe_id):
-    author = get_object_or_404(User, username=username)
-    recipe = get_object_or_404(author.author_recipes, pk=recipe_id)
-    if author != request.user:
+    recipe = get_object_or_404(Recipe, author__username=username, id=recipe_id)
+    if request.user != request.user:
         return redirect('recipe_view', username, recipe_id)
-    else:
-        recipe.delete()
+    recipe.delete()
     return redirect('index')
 
 
@@ -94,10 +87,9 @@ def profile(request, username):
 
 
 def recipe_view(request, username, recipe_id):
-    author = get_object_or_404(User, username=username)
-    recipe = get_object_or_404(author.author_recipes, pk=recipe_id)
+    recipe = get_object_or_404(Recipe, author__username=username, id=recipe_id)
     return render(request, 'recipes/single_page.html',
-                  {'author': author, 'recipe': recipe})
+                  {'author': request.user, 'recipe': recipe})
 
 
 @login_required
@@ -156,9 +148,9 @@ def save_shopping_list(request):
         filename = 'shopping_list.txt'
         content = ''
         for ingredient in ingredients:
-            string = f'{ingredient["ingredients__title"]} ' \
-                     f'({ingredient["ingredients__dimension"]}) - ' \
-                     f'{ingredient["total_amount"]}'
+            string = (f'{ingredient["ingredients__title"]} '
+                      f'({ingredient["ingredients__dimension"]}) - '
+                      f'{ingredient["total_amount"]}')
             content += string + '\n'
         response = HttpResponse(content, content_type='text/plain')
         response['Content-Disposition'] = 'attachment; filename={0}'.format(

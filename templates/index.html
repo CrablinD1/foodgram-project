@@ -11,11 +11,11 @@
     <main class="main container">
         <div class="main__header">
             <h1 class="main__title">Рецепты</h1>
-            {% include 'recipes/tags.html' %}
+            {% include 'recipes/includes/tags.html' %}
         </div>
         <div class="card-list">
             {% for recipe in page %}
-                {% include 'recipes/recipe.html' %}
+                {% include 'recipes/includes/recipe.html' %}
             {% endfor %}
         </div>
         {% include 'paginator.html' with items=page paginator=paginator %}
