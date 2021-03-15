@@ -14,7 +14,7 @@ def addclass(field, css):
 
 @register.filter
 def is_favorite(recipe, user):
-    return FavoriteRecipe.objects.filter(recipe=recipe, user=user).exists()
+    return user.favorites.filter(recipe=recipe).exists()
 
 
 @register.filter
