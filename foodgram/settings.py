@@ -5,21 +5,13 @@ from environs import Env
 env = Env()
 env.read_env()
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 
 SECRET_KEY = env.str('SECRET_KEY', default='SECRET')
 
 DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = ['*']
-
-# Application definition
 
 INSTALLED_APPS = [
     'users',
@@ -87,8 +79,6 @@ else:
         }
     }
 
-# Password validation
-# https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -105,8 +95,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.1/topics/i18n/
 
 LANGUAGE_CODE = 'ru'
 
@@ -127,9 +115,8 @@ if DEBUG:
     STATICFILES_DIRS = [
         os.path.join(BASE_DIR, 'static/'),
     ]
-
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
