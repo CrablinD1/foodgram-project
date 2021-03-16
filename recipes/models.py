@@ -61,9 +61,9 @@ class Recipe(models.Model):
 
 class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE,
-                                   related_name='ingredient_amount')
+                                   related_name='ingredient_amounts')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
-                               related_name='recipe_amount')
+                               related_name='recipe_amounts')
     amount = models.IntegerField()
 
     class Meta:
@@ -75,7 +75,7 @@ class FavoriteRecipe(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
                              related_name='favorites')
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
-                               related_name='favorite_recipes')
+                               related_name='favorites')
 
     objects = FavoriteRecipeManager()
 

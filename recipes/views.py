@@ -143,7 +143,7 @@ def save_shopping_list(request):
             pk__in=request.session[settings.PURCHASE_SESSION_ID])
         ingredients = recipes.values(
             'ingredients__title', 'ingredients__dimension').annotate(
-            total_amount=Sum('recipe_amount__amount'))
+            total_amount=Sum('recipe_amounts__amount'))
         filename = 'shopping_list.txt'
         content = ''
         for ingredient in ingredients:
