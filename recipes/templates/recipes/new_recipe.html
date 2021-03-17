@@ -42,11 +42,12 @@
                     <p class="form__label">Теги</p>
                     <div class="form__field-group">
                         <div class="tags">
-                            {% for tag in form.tags %}
+                            {% for tag in all_tags|all_tags %}
                                 <div class="tags__item">
-                                    {{ tag.tag }}
-                                    <label for="{{ tag.id_for_label }}"
-                                           class="tags__label">{{ tag.choice_label }}</label>
+                                    <input type="checkbox" name="tags" value="{{ tag.id }}" id="id_tags_{{ tag.id }}"
+                                           class="tags__checkbox tags__checkbox_style_{{ tag.color }}"
+                                           {% if tag in recipe.tags.all %}checked{% endif %}>
+                                    <label for="id_tags_{{ tag.id }}" class="tags__label">{{ tag.title }}</label>
                                 </div>
                             {% endfor %}
                         </div>
