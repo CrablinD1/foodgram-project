@@ -10,9 +10,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from foodgram.settings import OBJECT_PER_PAGE
 
 from .forms import RecipeForm
-from .models import (FavoriteRecipe, Ingredient, Recipe, RecipeIngredient,
-                     Subscription, User)
-from .utils import get_ingredients
+from .models import (FavoriteRecipe, Recipe, RecipeIngredient, Subscription,
+                     User)
 
 logging.basicConfig(filename='log.txt', level=logging.INFO)
 
@@ -27,40 +26,33 @@ def index(request):
                   {'page': page, 'paginator': paginator})
 
 
-def save_recipe(request, form, recipe):
-    form.save()
-    ingredients = get_ingredients(request)
-    for title, amount in ingredients.items():
-        ingredient = get_object_or_404(Ingredient, title=title)
-        recipe_ing = RecipeIngredient(recipe=recipe,
-                                      ingredient=ingredient,
-                                      amount=amount)
-        recipe_ing.save()
-
-
 @login_required
 def new_recipe(request):
-    form = RecipeForm(request.POST or None, files=request.FILES or None)
+    form = RecipeForm(request.POST or None, files=request.FILES or None,
+                      initial={"request": request}, )
     context = {'form': form}
-    if form.is_valid():
-        recipe = form.save(commit=False)
-        recipe.author = request.user
-        save_recipe(request, form, recipe)
-        return redirect('index')
-    return render(request, 'recipes/new_recipe.html', context)
+    if request.method != 'POST':
+        return render(request, 'recipes/new_recipe.html', context)
+    else:
+        if form.is_valid():
+            form.save()
+            return redirect('index')
 
 
 @login_required
 def recipe_edit(request, username, recipe_id):
     recipe = get_object_or_404(Recipe, author__username=username, id=recipe_id)
-    if request.user != request.user:
+    if recipe.author != request.user:
         return redirect('recipe_view', username, recipe_id)
     else:
         form = RecipeForm(request.POST or None, files=request.FILES or None,
+                          initial={"request": request},
                           instance=recipe)
-        if form.is_valid():
-            save_recipe(request, form, recipe)
-            return redirect('recipe_view', username, recipe_id)
+        if request.method == 'POST':
+            if form.is_valid():
+                RecipeIngredient.objects.filter(recipe=recipe).delete()
+                form.save()
+                return redirect('recipe_view', username, recipe_id)
         return render(request, 'recipes/new_recipe.html',
                       {'form': form, 'recipe': recipe})
 
