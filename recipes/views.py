@@ -80,7 +80,7 @@ def profile(request, username):
 def recipe_view(request, username, recipe_id):
     recipe = get_object_or_404(Recipe, author__username=username, id=recipe_id)
     return render(request, 'recipes/single_page.html',
-                  {'author': request.user, 'recipe': recipe})
+                  {'author': recipe.author, 'recipe': recipe})
 
 
 @login_required
